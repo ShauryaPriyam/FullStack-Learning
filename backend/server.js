@@ -14,7 +14,6 @@ const allowedOrigins = ['https://fullstack-learning.onrender.com',"http://localh
 app.use(
   cors({
     origin: allowedOrigins,
-    credentials: true,  // If you're sending cookies or sessions
   })
 );
 
