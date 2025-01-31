@@ -9,12 +9,14 @@ import path from "path";
 const app = express();
 const _dirname = path.resolve();
 app.use(express.json());
-// app.use(
-//   cors({
-//     origin: "http://localhost:5173",
-//     credentials: true,
-//   })
-// );
+
+const allowedOrigins = ['https://fullstack-learning-1.onrender.com']; // Replace with your frontend's URL in production
+app.use(
+  cors({
+    origin: allowedOrigins,
+    credentials: true,  // If you're sending cookies or sessions
+  })
+);
 
 
 app.use("/api/products", productRoutes);
