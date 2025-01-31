@@ -10,7 +10,7 @@ const app = express();
 const _dirname = path.resolve();
 app.use(express.json());
 
-const allowedOrigins = ['https://fullstack-learning-1.onrender.com']; // Replace with your frontend's URL in production
+const allowedOrigins = ['https://fullstack-learning.onrender.com']; // Replace with your frontend's URL in production
 app.use(
   cors({
     origin: allowedOrigins,
