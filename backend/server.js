@@ -3,7 +3,7 @@ import { connectDB } from "./config/db.js";
 import dotenv from "dotenv";
 dotenv.config();
 import productRoutes from "./routes/product-route.js";
-// import cors from "cors";
+import cors from "cors";
 import path from "path";
 
 const app = express();
