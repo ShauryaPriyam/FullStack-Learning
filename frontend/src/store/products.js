@@ -1,5 +1,10 @@
 import { create } from "zustand";
 
+const LOCAL_URL = "http://localhost:5000";
+const REMOTE_URL = "https://fullstack-learning.onrender.com";
+
+const getBaseUrl = () => (window.location.hostname === "localhost" ? LOCAL_URL : REMOTE_URL);
+
 export const useProductStore = create((set) => ({
   products: [],
   setProducts: (newProducts) => set({ products: newProducts }),
@@ -7,7 +12,7 @@ export const useProductStore = create((set) => ({
     if (!newProduct.name || !newProduct.price || !newProduct.image) {
       return { success: false, message: "Please fill all fields" };
     }
-    const res = await fetch("http://localhost:5000/api/products", {
+    const res = await fetch(`${getBaseUrl()}/api/products`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -20,12 +25,12 @@ export const useProductStore = create((set) => ({
     return { success: true, message: "Product created successfully" };
   },
   fetchProducts: async () => {
-    const res = await fetch("http://localhost:5000/api/products");
+    const res = await fetch(`${getBaseUrl()}/api/products`);
     const data = await res.json();
     set({ products: data.data });
   },
   deleteProduct: async (id) => {
-    const res = await fetch(`http://localhost:5000/api/products/${id}`, {
+    const res = await fetch(`${getBaseUrl()}/api/products/${id}`, {
       method: "DELETE",
     });
     const data = await res.json();
