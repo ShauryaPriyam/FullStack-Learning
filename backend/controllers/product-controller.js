@@ -1,47 +1,68 @@
-import { create } from "zustand";
+import Product from "../models/product-model.js";
+import mongoose from "mongoose";
 
-const LOCAL_URL = "http://localhost:5000";
-const REMOTE_URL = "https://fullstack-learning.onrender.com";
+export const getProducts = async (req, res) => {
+  try {
+    const products = await Product.find({});
+    res.status(200).json({ success: true, data: products });
+  } catch (err) {
+    console.log(err.message);
+    res.status(500).json({ success: false, data: "error occur!" });
+  }
+};
 
-const getBaseUrl = () => (window.location.hostname === "localhost" ? LOCAL_URL : REMOTE_URL);
+export const newProducts = async (req, res) => {
+  let product = req.body;
+  if (!product.name || !product.price || !product.image) {
+    return res
+      .status(400)
+      .json({ success: false, message: "Please provide all fields" });
+  }
+  try {
+    const newProduct = await Product.create(product);
+    res.status(201).json({ success: true, data: newProduct });
+  } catch (err) {
+    console.log(err.message);
+    res.status(500).json({ success: false, message: "Server Error" });
+  }
+};
 
-export const useProductStore = create((set) => ({
-  products: [],
-  setProducts: (newProducts) => set({ products: newProducts }),
-  createProduct: async (newProduct) => {
-    if (!newProduct.name || !newProduct.price || !newProduct.image) {
-      return { success: false, message: "Please fill all fields" };
-    }
-    const res = await fetch(`${getBaseUrl()}/api/products`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(newProduct),
+export const updateProducts = async (req, res) => {
+  const { _id } = req.params;
+  const product = req.body;
+  try {
+    const productDetail = await Product.findOneAndUpdate({ _id }, product, {
+      new: true,
     });
-
-    const data = await res.json();
-    set((state) => ({ products: [...state.products, data.data] }));
-    return { success: true, message: "Product created successfully" };
-  },
-  fetchProducts: async () => {
-    const res = await fetch(`${getBaseUrl()}/api/products`);
-    const data = await res.json();
-    set({ products: data.data });
-  },
-  deleteProduct: async (id) => {
-    const res = await fetch(`${getBaseUrl()}/api/products/${id}`, {
-      method: "DELETE",
-    });
-    const data = await res.json();
-    if (!data.success) {
-      return { success: false, message: data.message };
+    if (!productDetail) {
+      return res
+        .status(404)
+        .json({ success: false, data: "Product not found" });
     }
-    // update ui immediately without refresh
-    set((state) => ({
-      products: state.products.filter((product) => product._id !== id),
-    }));
-    return { success: true, message: "Product deleted successfully" };
-  },
-}));
+    res
+      .status(200)
+      .json({ success: true, data: "Product updated successfully" });
+  } catch (err) {
+    console.log(err.message);
+    res.status(500).json({ success: false, data: "An error occurred" });
+  }
+};
 
+export const deleteProducts = async (req, res) => {
+  const { _id } = req.params;
+  const product = req.body;
+  try {
+    const productDetail = await Product.findOneAndDelete({ _id });
+    if (!productDetail) {
+      return res
+        .status(404)
+        .json({ success: false, data: "Product not found" });
+    }
+    res
+      .status(200)
+      .json({ success: true, data: "Product deleted successfully" });
+  } catch (err) {
+    console.log(err.message);
+    res.status(500).json({ success: false, data: "An error occurred" });
+  }
+};
